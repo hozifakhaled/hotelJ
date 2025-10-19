@@ -1,11 +1,16 @@
 package com.example.hotel.Rooms;
 
+import com.example.hotel.Rooms.RoomTypes;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.beans.Transient;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Table(name = "rooms")
 @Entity
@@ -20,7 +25,7 @@ public class RoomEntity {
     @Column(unique = true, nullable = false)
     private Long roomNumber;
 
-    private boolean IsReversed =false;
+    private boolean isReversed = false;
 
     private String image;
 
@@ -31,9 +36,26 @@ public class RoomEntity {
 
     private String description;
 
-    @ElementCollection
-    @CollectionTable(name = "room_amenities", joinColumns = @JoinColumn(name = "room_id"))
-    @Column(name = "amenity")
-    private Set<String> amenities;
+    @Column(name = "amenities", columnDefinition = "TEXT")
+    private String amenitiesJson; // يخزن JSON في العمود
+
+    @Transient
+    public List<String> getAmenities() {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(amenitiesJson, List.class);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public void setAmenities(Collection<String> amenities) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            this.amenitiesJson = mapper.writeValueAsString(amenities);
+        } catch (Exception e) {
+            this.amenitiesJson = "[]";
+        }
+    }
 
 }
