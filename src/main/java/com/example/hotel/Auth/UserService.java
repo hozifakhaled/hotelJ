@@ -43,6 +43,9 @@ public class UserService {
         String token = jwtService.generateToken(savedUser);
         return new AuthResponse(token, savedUser.getRole().name());
     }
+
+
+
     public AuthResponse login(UserDto userDto) {
         UserEntity user = userRepo.findByPhoneNumber(userDto.getPhoneNumber())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
